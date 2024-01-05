@@ -1,6 +1,6 @@
 // clientRepository.js
 import Client from "./model.js";
-import AppError from "../../utils/AppError.js";
+import AppError from "../../utils/appError.js";
 class ClientRepository {
   async list() {
     try {

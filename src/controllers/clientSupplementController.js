@@ -1,6 +1,7 @@
 import ClientSupplement from "../models/ClientSupplement/model.js";
 import ClientSupplementRepository from "../models/ClientSupplement/repo.js";
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
+
 const clientSupplementRepository = new ClientSupplementRepository();
 
 class ClientSupplementController {

@@ -1,6 +1,6 @@
 import ClientDiet from "../models/ClientDiets/model.js";
 import ClientDietRepository from "../models/ClientDiets/repo.js";
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
 const clientDietRepository = new ClientDietRepository();
 
 class ClientDietsController {

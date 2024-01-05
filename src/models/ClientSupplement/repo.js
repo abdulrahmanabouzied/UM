@@ -1,5 +1,5 @@
 import ClientSupplement from "./model.js";
-import AppError from "../../utils/AppError.js";
+import AppError from "../../utils/appError.js";
 
 class ClientSupplementRepository {
   async list(filter) {

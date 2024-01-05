@@ -2,7 +2,7 @@ import ClientWorkout from "./model.js";
 import Client from "../Clients/model.js";
 import WorkoutPlan from "../WorkoutPlans/model.js";
 
-import AppError from "../../utils/AppError.js";
+import AppError from "../../utils/appError.js";
 
 class ClientWorkoutRepository {
   async list(filter) {

@@ -1,7 +1,7 @@
 import BlogRepository from "../models/Blogs/repo.js";
 import { uploadFile, removeFile } from "../middlewares/cloudinaryUploader.js";
 import Blog from "../models/Blogs/model.js";
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
 
 const blogRepository = new BlogRepository();
 class BlogsController {

@@ -5,7 +5,8 @@ import {
 } from "../middlewares/cloudinaryUploader.js";
 import Coach from "../models/Coaches/model.js";
 import CoachRepository from "../models/Coaches/repo.js";
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
+
 import Client from "./../models/Clients/model.js";
 
 const coachRepository = new CoachRepository();

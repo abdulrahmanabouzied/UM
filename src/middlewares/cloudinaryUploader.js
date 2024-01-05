@@ -3,7 +3,7 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
 import { config } from "dotenv";
 config();
 

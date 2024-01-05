@@ -1,6 +1,6 @@
 import Client from "../../models/Clients/model.js";
 import sendMail from "../../utils/mailer.js";
-import AppError from "../../utils/AppError.js";
+import AppError from "../../utils/appError.js";
 import { generateToken } from "./../../utils/token.service.js";
 import crypto from "crypto";
 import { parseTime } from "../../utils/time.service.js";

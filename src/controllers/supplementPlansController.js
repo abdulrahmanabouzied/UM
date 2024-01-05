@@ -1,5 +1,5 @@
 import SupplementPlanRepository from "../models/SupplementPlans/repo.js";
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
 const supplementPlanRepository = new SupplementPlanRepository();
 import SupplementPlan from "./../models/SupplementPlans/model.js";
 class SupplementPlansController {

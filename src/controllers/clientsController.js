@@ -1,5 +1,6 @@
 import ClientRepository from "../models/Clients/repo.js";
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
+
 import Client from "../models/Clients/model.js";
 import ClientSupplement from "../models/ClientSupplement/model.js";
 import mongoose from "mongoose";

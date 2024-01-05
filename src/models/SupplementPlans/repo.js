@@ -1,5 +1,5 @@
 import SupplementPlan from "./model.js";
-import AppError from "../../utils/AppError.js";
+import AppError from "../../utils/appError.js";
 import Client from "../Clients/model.js";
 import ClientSupplement from "../ClientSupplement/model.js";
 class SupplementPlanRepository {

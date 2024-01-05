@@ -1,6 +1,6 @@
 import ClientDiet from "./model.js";
 import Client from "../Clients/model.js";
-import AppError from "../../utils/AppError.js";
+import AppError from "../../utils/appError.js";
 
 class ClientDietRepository {
   async list(filter) {

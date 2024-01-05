@@ -1,7 +1,8 @@
 import ClientWorkoutRepository from "../models/ClientWorkouts/repo.js";
 const clientWorkoutRepository = new ClientWorkoutRepository();
 
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
+
 import ClientWorkout from "../models/ClientWorkouts/model.js";
 // import Client from "./../models/Clients/model.js";
 

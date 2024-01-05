@@ -1,7 +1,8 @@
 import DietPlanRepository from "../models/DietPlans/repo.js";
 import DietPlan from "./../models/DietPlans/model.js";
 const dietPlanRepository = new DietPlanRepository();
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
+
 // import ClientDiet from "../models/ClientDiets/model.js";
 // import ClientDietRepository from "../models/ClientDiets/repo.js";
 

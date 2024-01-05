@@ -1,5 +1,5 @@
 import Blog from "./model.js";
-import AppError from "../../utils/AppError.js";
+import AppError from "../../utils/appError.js";
 class BlogRepository {
   async list(filter) {
     try {

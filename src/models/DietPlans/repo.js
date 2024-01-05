@@ -1,5 +1,5 @@
 import DietPlan from "./model.js";
-import AppError from "../../utils/AppError.js";
+import AppError from "../../utils/appError.js";
 import Client from "../Clients/model.js";
 import ClientDiet from "../ClientDiets/model.js";
 
