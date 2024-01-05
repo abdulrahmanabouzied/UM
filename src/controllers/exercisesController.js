@@ -6,7 +6,7 @@ import {
   removeFile,
   handleFiles,
 } from "../middlewares/cloudinaryUploader.js";
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
 import Exercise from "../models/Exercises/model.js";
 
 class ExercisesController {
