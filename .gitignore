@@ -1,0 +1,13 @@
+/node_modules/
+
+DB_SCHEMA.txt
+
+.env
+/.vscode/*
+
+# Tests
+
+_prog_test.js
+
+# statics
+# /src/public/uploads
