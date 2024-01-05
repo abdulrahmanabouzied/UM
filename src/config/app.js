@@ -18,7 +18,7 @@ import passport from "passport";
 import googlePassportStrategy from "./googlePassportStrategy.js";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-import rateLimit from "express-rate-limit";
+// import rateLimit from "express-rate-limit";
 
 // import sessionAuth from "../middlewares/session.auth.js";
 
@@ -77,7 +77,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })
 );
-
+/*
 app.use(
   "/api",
   rateLimit({
@@ -85,7 +85,7 @@ app.use(
     limit: 200,
     message: "Rate limit exceeded",
   })
-);
+);*/
 app.use(api);
 
 // exports
