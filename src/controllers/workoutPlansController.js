@@ -6,7 +6,7 @@ import {
   removeFile,
   handleFiles,
 } from "../middlewares/cloudinaryUploader.js";
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
 import WorkoutPlan from "./../models/WorkoutPlans/model.js";
 class WorkoutPlansController {
   async getPlans(req, res, next) {
