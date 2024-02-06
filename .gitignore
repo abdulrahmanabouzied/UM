@@ -7,7 +7,7 @@ DB_SCHEMA.txt
 
 # Tests
 
-_prog_test.js
+/__test__
 
 # statics
 # /src/public/uploads
