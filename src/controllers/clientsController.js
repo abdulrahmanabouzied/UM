@@ -2,7 +2,6 @@ import ClientRepository from "../models/Clients/repo.js";
 import AppError from "../utils/appError.js";
 
 import Client from "../models/Clients/model.js";
-import ClientSupplement from "../models/ClientSupplement/model.js";
 import mongoose from "mongoose";
 import {
   uploadFile,
@@ -24,6 +23,18 @@ class ClientsController {
     const clientId = req.params.id;
     const { query } = req.query;
     const result = await clientRepository.getOne({ _id: clientId }, query);
+    if (!result.success) {
+      return next(result);
+    }
+    res.status(result.status).json(result);
+  }
+
+  async getClientCoach(req, res, next) {
+    const clientId = req.params.id;
+    const { query } = req.query;
+    const result = await clientRepository
+      .getOneCoach({ _id: clientId }, query)
+      .populate("coach");
     if (!result.success) {
       return next(result);
     }
@@ -56,7 +67,6 @@ class ClientsController {
 
       client.WorkoutPlan.checkState();
       client.WorkoutPlan.checkDays();
-      console.log("\nHere\n");
       await client.WorkoutPlan.save();
 
       res.status(200).json({
@@ -109,6 +119,7 @@ class ClientsController {
       return next(new AppError(error.name, error.message, 500));
     }
   }
+
   async getDietPlanDay(req, res, next) {
     try {
       const { id } = req.params;
@@ -413,34 +424,47 @@ class ClientsController {
       }
     }
 
+    // if (files?.inbody) {
+    //   if (client?.inbody?.path) {
+    //     try {
+    //       fs.unlinkSync(client.inbody.path);
+    //     } catch (error) {
+    //       console.log(error.code);
+    //       if (error.code != "ENOENT") {
+    //         return next(error);
+    //       }
+    //     }
+    //   }
+
+    //   const file = files.inbody[0];
+    //   newData.inbody = file;
+    //   client.inbodyRequested = false;
+    // }
     if (files?.inbody) {
-      if (client?.inbody?.path) {
-        try {
-          fs.unlinkSync(client.inbody.path);
-        } catch (error) {
-          console.log(error.code);
-          if (error.code != "ENOENT") {
-            return next(error);
-          }
+      if (client?.inbody?.public_id) {
+        const flushed = await removeFile("raw", client?.inbody?.public_id);
+        if (!flushed.success) {
+          return next(flushed);
         }
       }
-
-      const file = files.inbody[0];
-      // const filePath = `${req.protocol}://${req.get("host")}/files/uploads/${
-      //   file.filename
-      // }`;
-
-      // console.log(filePath);
-      // console.log(file.filename);
-
-      // newData.inbody = { ...file, url: filePath };
-      newData.inbody = file;
+      uploadedData = await handleFiles(
+        newData,
+        files,
+        "Clients",
+        "inbody",
+        "raw"
+      );
+      if (!uploadedData) {
+        return next(uploadedData);
+      }
       client.inbodyRequested = false;
     }
 
     if (client?.coach && newData?.inbody) {
       client.coach.notifications.push({
+        title: "inbody uploaded",
         message: `${client.fullname} uploaded an inbody.`,
+        date: new Date(),
       });
       await client.coach.save();
     }
@@ -495,7 +519,9 @@ class ClientsController {
 
     client.inbodyRequested = true;
     client.notifications.push({
+      title: "inbody request",
       message: `your coach has requested an inbody.`,
+      date: new Date(),
     });
     await client.save();
     res.status(200).json({
@@ -575,6 +601,30 @@ class ClientsController {
         success: true,
         status: 200,
         data: "deleted successfully!",
+      });
+    } catch (error) {
+      return next(new AppError(error.name, error, 500));
+    }
+  }
+
+  async deleteAllNotifications(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const client = await Client.findByIdAndUpdate(id, {
+        $unset: {
+          notifications: null,
+        },
+      });
+
+      if (!client) {
+        return next(new AppError("NOT_FOUND", "coach not found", 404));
+      }
+
+      res.status(200).json({
+        success: true,
+        status: 200,
+        data: "Notifications deleted successfully!",
       });
     } catch (error) {
       return next(new AppError(error.name, error, 500));

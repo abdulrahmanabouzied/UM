@@ -63,6 +63,11 @@ app
   .delete(asyncHandler(Controller.deleteNotifications))
   .patch(asyncHandler(Controller.markSeen))
   .put(asyncHandler(Controller.markAllSeen));
+app.delete(
+  "/:id/notifications/delete",
+  authenticate,
+  asyncHandler(Controller.deleteAllNotifications)
+);
 
 // Inbody API
 app
@@ -70,4 +75,6 @@ app
   .all(authenticate)
   .get(asyncHandler(Controller.getInbody))
   .patch(restrictTo("coach"), asyncHandler(Controller.requestInbody));
+
+app.get("/:id/coach", authenticate, asyncHandler(Controller.getClientCoach));
 export default app;

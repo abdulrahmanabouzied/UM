@@ -40,7 +40,7 @@ daySchema.methods.startDay = function () {
   this.startedAt = new Date();
   this.endsAt = new Date(this.startedAt.getTime() + parseTime("1d", "ms"));
 
-  console.log(this);
+  // console.log(this);
 };
 
 const clientWorkoutSchema = new mongoose.Schema(
@@ -87,26 +87,27 @@ clientWorkoutSchema.pre("save", function (next) {
   // TODO: enhance the logic
   const currDate = new Date();
 
-  if (!this.isModified("assignedAt") && !this.isModified("days")) return next();
+  if (
+    !this.isModified("assignedAt") &&
+    !this.isModified("endingAt") &&
+    !this.isModified("days")
+  )
+    return next();
 
-  let dayCount = this.days.length;
   this.assignedAt = new Date(this.assignedAt);
-  this.endingAt = new Date(
-    this.assignedAt.getTime() + parseTime(`${dayCount}d`, "ms")
-  );
 
-  if (this.assignedAt >= currDate) {
+  if (this.assignedAt > currDate) {
     this.state = "pendingStart";
-  }
-  if (this.assignedAt <= currDate) {
+  } else if (this.assignedAt <= currDate) {
     this.state = "inProgress";
-  } else if (this.endingAt <= currDate) {
+  }
+  if (this.endingAt <= currDate) {
     this.state = "done";
   }
 
-  this.days.forEach((day) => {
+  this.days.forEach((day, idx) => {
     day.startsAt = new Date(
-      this.assignedAt.getTime() + parseTime(`${day.order - 1}d`, "ms")
+      this.assignedAt.getTime() + parseTime(`${idx}d`, "ms")
     );
   }, this);
 
@@ -115,11 +116,8 @@ clientWorkoutSchema.pre("save", function (next) {
 
 // to calculate the prpoper corresponding date to each field
 clientWorkoutSchema.methods.clacDates = function () {
-  let dayCount = this.days.length;
-  this.assignedAt = new Date(this.assignedAt);
-  this.endingAt = new Date(
-    this.assignedAt.getTime() + parseTime(`${dayCount}d`, "ms")
-  );
+  let currDate = new Date();
+  // this.assignedAt = new Date(this.assignedAt);
 
   if (this.assignedAt >= currDate) {
     this.state = "pendingStart";
@@ -129,18 +127,39 @@ clientWorkoutSchema.methods.clacDates = function () {
     this.state = "done";
   }
 
-  this.days.forEach((day) => {
+  this.days.forEach((day, idx) => {
     day.startsAt = new Date(
-      this.assignedAt.getTime() + parseTime(`${day.order - 1}d`, "ms")
+      this.assignedAt.getTime() + parseTime(`${idx}d`, "ms")
     );
   }, this);
 };
 
-// method to check if a day must be available
+/**
+ * checkDays
+ * @description method to check if a day must be available
+ */
 clientWorkoutSchema.methods.checkDays = function () {
-  // let dayCount = this.days.length;
   const currDate = Date.now();
 
+  // finding hte last done day to avail the next
+  let i = 0;
+  for (; i < this.days.length && this.days[i].state === "done"; i++);
+
+  switch (this.days[i]?.state) {
+    case "locked":
+      this.days[i].state = "available";
+      break;
+    case "inProgress":
+      if (currDate >= this.days[i]?.endsAt) {
+        this.days[i].state = "done";
+        if (this.days[i + 1]) {
+          this.days[i + 1].state = "available";
+        }
+      }
+      break;
+  }
+
+  /*
   this.days = this.days.map((day) => {
     if (currDate >= day.startsAt && day.state == "locked") {
       day.state = "available";
@@ -149,17 +168,22 @@ clientWorkoutSchema.methods.checkDays = function () {
     }
 
     return day;
-  });
+  });*/
 };
 
-// check if the start date is passed
+/**
+ * checkState
+ * @description check if the start date is passed
+ * @returns {String}
+ */
 clientWorkoutSchema.methods.checkState = function () {
   const currDate = new Date();
 
-  if (currDate >= this.assignedAt) {
+  if (this.assignedAt > currDate) {
+    this.state = "pendingStart";
+  } else if (this.assignedAt <= currDate) {
     this.state = "inProgress";
   }
-
   if (currDate >= this.endingAt) {
     this.state = "done";
   }
@@ -168,7 +192,6 @@ clientWorkoutSchema.methods.checkState = function () {
 };
 
 // adding day
-
 clientWorkoutSchema.methods.addDay = function (day) {
   if (!day.order) {
     day.order = this.days.length + 1;
@@ -176,8 +199,6 @@ clientWorkoutSchema.methods.addDay = function (day) {
 
   this.days.push(day);
 };
-
-// clientWorkoutSchema.methods.startDay = function (day) {};
 
 const ClientWorkout = mongoose.model("ClientWorkouts", clientWorkoutSchema);
 

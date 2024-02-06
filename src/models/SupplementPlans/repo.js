@@ -52,6 +52,13 @@ class SupplementPlanRepository {
       await newClientPlan.save();
 
       client.SupplementPlan = newClientPlan._id;
+      client.notifications.push({
+        title: "Supplement plan assigned",
+        message: `you are now assigned to a supplement plan that starts on ${new Date(
+          assignedAt
+        ).toLocaleString()}`,
+        date: new Date(),
+      });
       await client.save();
 
       if (!newClientPlan) {

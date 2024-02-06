@@ -46,12 +46,13 @@ const coachSchema = new mongoose.Schema(
     },
     notifications: [
       {
+        title: String,
         message: String,
         date: {
           type: Date,
-          // validate: [validator.isDate, "Invalid Date"],
           default: Date.now,
         },
+        data: Object,
         seen: {
           type: Boolean,
           default: false,

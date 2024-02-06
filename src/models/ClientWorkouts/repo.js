@@ -46,9 +46,10 @@ class ClientWorkoutRepository {
    * @param {String} clientId
    * @param {String} planId
    * @param {Date} assignedAt
+   * @param {Date} endingAt
    * @returns {Object | AppError} - response object
    */
-  async assignPlan(clientId, planId, assignedAt) {
+  async assignPlan(clientId, planId, assignedAt, endingAt) {
     try {
       const client = await Client.findById(clientId);
 
@@ -69,6 +70,7 @@ class ClientWorkoutRepository {
         client: client._id,
         plan: assignedPlan._id,
         assignedAt,
+        endingAt,
         days: assignedPlan.days.toObject(),
       };
 
@@ -76,6 +78,13 @@ class ClientWorkoutRepository {
       await newClientPlan.save();
 
       client.WorkoutPlan = newClientPlan._id;
+      client.notifications.push({
+        title: "Workout plan assigned",
+        message: `you are now assigned to a workout plan that starts on ${new Date(
+          assignedAt
+        ).toLocaleString()}`,
+        date: new Date(),
+      });
       await client.save();
 
       if (!newClientPlan) {

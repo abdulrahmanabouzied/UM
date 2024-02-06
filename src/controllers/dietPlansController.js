@@ -24,11 +24,10 @@ class DietPlansController {
       "lunch",
       "eveningSnacks",
       "dinner",
-    ];
+    ].map((item) => `days.${item}.ingredients.item`);
 
-    const plan = await DietPlan.findById(id).populate(
-      populateList.map((item) => `days.${item}.ingredients.item`)
-    );
+    console.log(populateList);
+    const plan = await DietPlan.findById(id).populate(populateList);
 
     if (!plan) {
       return next(new AppError("NOT_FOUND", "Plan not found", 404));

@@ -1,19 +1,17 @@
 import compression from "compression";
 import express from "express";
 import helmet from "helmet";
-import path from "path";
+// import path from "path";
 import url from "url";
 import cors from "cors";
 import { config } from "dotenv";
-// import cookieParser from "cookie-parser";
 import dbConnection from "./database.js";
 import morgan from "morgan";
 import { createServer } from "http";
-import { Server } from "socket.io";
+// import { Server } from "socket.io";
 import handleScoket from "../utils/socketHandler.js";
 import api from "./../routes/index.routes.js";
 // import googlePassportStrategy from "./googlePassportStrategy.js";
-// const passport = require('passport');
 import passport from "passport";
 import googlePassportStrategy from "./googlePassportStrategy.js";
 import session from "express-session";
@@ -26,17 +24,18 @@ import cookieParser from "cookie-parser";
 const app = express();
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 const server = createServer(app);
+/*
 const io = new Server(server, {
   cors: {
     origin: "*",
   },
 });
 const chat = io.of("/socket");
-
+*/
 // methods
 config();
 await dbConnection();
-handleScoket(chat);
+// handleScoket(chat);
 // googlePassportStrategy(passport);
 // facebookPassportStrategy(passport);
 // middlewares

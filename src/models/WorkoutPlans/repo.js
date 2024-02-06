@@ -13,7 +13,9 @@ class WorkoutPlanRepository {
 
   async getOne(filter) {
     try {
-      const workoutPlan = await WorkoutPlan.findOne(filter).lean();
+      const workoutPlan = await WorkoutPlan.findOne(filter)
+        .populate("days.exercises.exercise")
+        .lean();
       if (!workoutPlan) {
         return new AppError("NOT_FOUND", "workoutPlan not found", 404);
       }

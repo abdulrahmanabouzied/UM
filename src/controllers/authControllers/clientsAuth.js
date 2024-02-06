@@ -1,9 +1,12 @@
 import Client from "../../models/Clients/model.js";
+import Coach from "../../models/Coaches/model.js";
 import sendMail from "../../utils/mailer.js";
 import AppError from "../../utils/appError.js";
 import { generateToken } from "./../../utils/token.service.js";
 import crypto from "crypto";
 import { parseTime } from "../../utils/time.service.js";
+import Notifications from "../../utils/notify.service.js";
+const notify = new Notifications(Coach);
 
 class clientsAuthController {
   async signup(req, res, next) {
@@ -54,6 +57,60 @@ class clientsAuthController {
     await client.save({ validateBeforeSave: false });
 
     next(new AppError("EMAILING_ERROR", "error sending email", 500));
+  }
+
+  async authGoogle(client) {
+    const { id, email, displayName } = client;
+    const existingUser = await Client.findOne({
+      "ssoAuth.googleId": id,
+    });
+    if (existingUser) {
+      return existingUser;
+    }
+    let userObj = {
+      ssoAuth: { googleId: id },
+      fullname: displayName,
+      // firstName: profile.name.givenName,
+      // lastName: profile.name.familyName,
+      email,
+      password: "",
+      role: "client",
+    };
+    //handle create user fields
+    const user = await Client.create(userObj);
+
+    return user;
+  }
+
+  async loginGoogle(req, res, next) {
+    const profile = req.body;
+    const client = await this.authGoogle(profile);
+
+    let data = {
+      id: client._id,
+      email: client.email,
+      role: client.role,
+    };
+
+    let accessToken = await generateToken(data, parseTime("1d", "s"));
+    let refreshToken = await generateToken(data, parseTime("10d", "s"));
+
+    if (!client.emailActive) {
+      client.emailActive = true;
+    }
+
+    client.active = true;
+    await client.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+      success: true,
+      status: 200,
+      data: {
+        accessToken,
+        refreshToken,
+        ...client.toObject(),
+      },
+    });
   }
 
   async login(req, res, next) {
@@ -159,8 +216,8 @@ class clientsAuthController {
       }
     ).select("_id email");
 
-    console.log(`Code: ${OTP}`);
-    console.log(`Verifying email: `, client);
+    // console.log(`Code: ${OTP}`);
+    // console.log(`Verifying email: `, client);
 
     if (!client) {
       return next(
@@ -175,6 +232,13 @@ class clientsAuthController {
       email: client.email,
       role: client.role,
     };
+
+    // send a note to the coach
+    await notify.notifyCoach({
+      title: "registeration",
+      message: "new client entered UM",
+      date: new Date(),
+    });
 
     let accessToken = await generateToken(data, parseTime("5m", "s"));
     let refreshToken = await generateToken(data, parseTime("10m", "s"));

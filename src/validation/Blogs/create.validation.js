@@ -20,9 +20,8 @@ const blogCreateSchema = Joi.object({
     "string.empty": "Details cannot be empty",
   }),
 
-  coverImage: Joi.object().messages({
+  coverImage: Joi.object().optional().messages({
     "object.base": "Cover image must be an object",
-    "any.required": "Cover image is required",
   }),
 
   category: Joi.string().required().trim().messages({

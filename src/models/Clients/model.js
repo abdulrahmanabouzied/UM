@@ -119,6 +119,7 @@ const clientSchema = new mongoose.Schema(
           type: Date,
           default: Date.now,
         },
+        data: Object,
         seen: {
           type: Boolean,
           default: false,
@@ -194,19 +195,21 @@ clientSchema.methods.createPasswordResetTokenOTP = function () {
 
 // virtuals
 
+// calc the BMI
 clientSchema.virtual("BMI").get(function () {
   // weight in kg, height in m
-  return (this.weight / (this.height / 100) ** 2).toFixed(2);
+  return (this.weight / (this.height / 100) ** 2).toFixed(2) || 0;
 });
 
-clientSchema.virtual("inbody.url").get(function () {
-  if (this.inbody && this.inbody.path) {
-    return `${process.env.BASE_URL || "http://localhost:4000"}/files/uploads/${
-      this.inbody.filename
-    }`;
-  }
-  return null;
-});
+// to get the client inbody url
+// clientSchema.virtual("inbody.url").get(function () {
+//   if (this.inbody && this.inbody.path) {
+//     return `${process.env.BASE_URL || "http://localhost:4000"}/files/uploads/${
+//       this.inbody.filename
+//     }`;
+//   }
+//   return null;
+// });
 
 clientSchema.set("toObject", { virtuals: true });
 

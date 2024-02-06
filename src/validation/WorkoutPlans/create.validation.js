@@ -26,7 +26,7 @@ export const workoutPlanValidationSchema = Joi.object({
     "any.required": "Coach is required",
   }),
 
-  image: Joi.object().required().messages({
+  image: Joi.object().optional().messages({
     "object.base": "Image is required and must be an object",
   }),
 

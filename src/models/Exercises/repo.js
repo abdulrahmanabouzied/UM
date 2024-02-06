@@ -14,13 +14,9 @@ class ExerciseRepository {
   async getOne(filter) {
     try {
       const exercise = await Exercise.findOne(filter).lean();
+      console.log(exercise);
       if (!exercise) {
-        return {
-          status: 404,
-          success: false,
-          data: null,
-          error: "Exercise not found",
-        };
+        return new AppError("NOT_FOUND", "Exercise not found!", 404);
       }
       return { status: 200, success: true, data: exercise, error: null };
     } catch (error) {

@@ -17,7 +17,7 @@ export const exerciseCreateSchema = Joi.object({
     "any.only": "Gender must be one of: male, female",
   }),
 
-  image: Joi.object().messages({
+  image: Joi.object().optional().messages({
     "object.base": "Image is required and must be an object",
   }),
 

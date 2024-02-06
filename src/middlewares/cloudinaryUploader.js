@@ -13,7 +13,7 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-export const uploadFile = async (file, folder) => {
+export const uploadFile = async (file, folder, rtype = "auto") => {
   try {
     const {
       public_id,
@@ -26,7 +26,7 @@ export const uploadFile = async (file, folder) => {
       secure_url,
     } = await cloudinary.uploader.upload(file, {
       use_filename: true,
-      resource_type: "auto",
+      resource_type: rtype,
       folder,
     });
     console.log(public_id);
@@ -62,20 +62,27 @@ export const removeFile = async (rtype = "auto", ...public_ids) => {
       resource_type: rtype,
     });
 
-    console.log(result);
+    // console.log(result);
     return {
       success: true,
       code: 200,
       data: result,
     };
   } catch (error) {
+    console.log(error);
     return new AppError(error.name, error, 500, false, error.stack);
   }
 };
 
-export const handleFiles = async (target, files, folder, field) => {
+export const handleFiles = async (
+  target,
+  files,
+  folder,
+  field,
+  rtype = "auto"
+) => {
   if (files[field]?.length) {
-    const done = await uploadFile(files[field][0].path, folder);
+    const done = await uploadFile(files[field][0].path, folder, rtype);
     target[field] = done.data;
     return done;
   }

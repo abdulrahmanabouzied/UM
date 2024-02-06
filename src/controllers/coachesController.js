@@ -201,6 +201,30 @@ class CoachesController {
     }
   }
 
+  async deleteAllNotifications(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const coach = await Coach.findByIdAndUpdate(id, {
+        $unset: {
+          notifications: null,
+        },
+      });
+
+      if (!coach) {
+        return next(new AppError("NOT_FOUND", "coach not found", 404));
+      }
+
+      res.status(200).json({
+        success: true,
+        status: 200,
+        data: "Notifications deleted successfully!",
+      });
+    } catch (error) {
+      return next(new AppError(error.name, error, 500));
+    }
+  }
+
   async markSeen(req, res, next) {
     try {
       const { id } = req.params;

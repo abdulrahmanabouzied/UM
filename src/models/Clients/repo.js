@@ -13,7 +13,7 @@ class ClientRepository {
 
   async getOne(filter, query) {
     try {
-      const client = await Client.findOne(filter);
+      const client = await Client.findOne(filter).populate("coach");
 
       if (!client) {
         return new AppError("NOT_FOUND", "Client not found", 404);
@@ -30,6 +30,34 @@ class ClientRepository {
         status: 200,
         success: true,
         data: client.toObject(),
+        error: null,
+      };
+    } catch (error) {
+      return new AppError(error.name, error.message, 500, false, error.stack);
+    }
+  }
+
+  async getOneCoach(filter, query) {
+    try {
+      const client = await Client.findOne(filter)
+        .populate("coach")
+        .select("coach");
+
+      if (!client) {
+        return new AppError("NOT_FOUND", "Client not found", 404);
+      }
+      if (query) {
+        return {
+          status: 200,
+          success: true,
+          data: client?.coach.toObject()[query],
+          error: null,
+        };
+      }
+      return {
+        status: 200,
+        success: true,
+        data: client?.coach.toObject(),
         error: null,
       };
     } catch (error) {

@@ -41,6 +41,13 @@ class DietPlanRepository {
       await newClientPlan.save();
 
       client.NutritionPlan = newClientPlan._id;
+      client.notifications.push({
+        title: "Nutrition plan assigned",
+        message: `you are now assigned to a nutrition plan that starts on ${new Date(
+          assignedAt
+        ).toLocaleString()}`,
+        date: new Date(),
+      });
       await client.save();
 
       if (!newClientPlan) {
