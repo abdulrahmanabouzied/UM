@@ -119,11 +119,12 @@ clientWorkoutSchema.methods.clacDates = function () {
   let currDate = new Date();
   // this.assignedAt = new Date(this.assignedAt);
 
-  if (this.assignedAt >= currDate) {
+  if (this.assignedAt > currDate) {
     this.state = "pendingStart";
   } else if (this.assignedAt <= currDate) {
     this.state = "inProgress";
-  } else if (this.endingAt <= currDate) {
+  }
+  if (this.endingAt <= currDate) {
     this.state = "done";
   }
 

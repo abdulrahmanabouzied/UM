@@ -60,8 +60,8 @@ class ClientWorkoutsController {
 
   async assignPlan(req, res, next) {
     // client id
-    const { id } = req.params;
-    const { plan, assignedAt, endingAt } = req.body;
+    const { plan, id } = req.params;
+    const { assignedAt, endingAt } = req.body;
 
     if (!plan || !assignedAt || !endingAt) {
       return next(new AppError("planId or assignedAt is missing", 400));

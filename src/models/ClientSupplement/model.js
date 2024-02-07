@@ -131,22 +131,22 @@ const clientSupplementSchema = new mongoose.Schema(
 clientSupplementSchema.pre("save", function (next) {
   const currDate = new Date(Date.now());
 
-  if (!this.isModified("assignedAt") && !this.isModified("days")) return next();
-
-  let dayCount = this.days.length;
-  console.log(`plan assignment: ${this.assignedAt}`);
-  this.assignedAt = new Date(this.assignedAt);
-  this.endingAt = new Date(
-    this.assignedAt.getTime() + parseTime(`${dayCount}d`, "ms")
-  );
+  if (
+    !this.isModified("assignedAt") &&
+    !this.isModified("endingAt") &&
+    !this.isModified("days")
+  )
+    return next();
 
   if (this.assignedAt > currDate) {
     this.state = "pendingStart";
   } else if (this.assignedAt <= currDate) {
     this.state = "inProgress";
-  } else if (this.endingAt <= currDate) {
+  }
+  if (this.endingAt <= currDate) {
     this.state = "done";
   }
+
   this.days.forEach((day) => {
     day.startsAt = new Date(
       this.assignedAt.getTime() + parseTime(`${day.order - 1}d`, "ms")
@@ -158,33 +158,22 @@ clientSupplementSchema.pre("save", function (next) {
 
 // the corresponding date for each day in the array
 clientSupplementSchema.methods.clacDates = async function () {
-  const currDate = new Date(Date.now());
-
-  let dayCount = this.days.length;
-  this.assignedAt = new Date(this.assignedAt);
-  this.endingAt = new Date(
-    this.assignedAt.getTime() + parseTime(`${dayCount}d`, "ms")
-  );
-
   this.days.forEach((day) => {
     day.startsAt = new Date(
       this.assignedAt.getTime() + parseTime(`${day.order - 1}d`, "ms")
     );
   }, this);
-
-  console.log(this.days);
-
-  return currDate;
 };
 
 clientSupplementSchema.methods.checkState = function () {
   const currDate = new Date();
 
-  if (currDate < this.assignedAt) {
+  if (this.assignedAt > currDate) {
     this.state = "pendingStart";
-  } else if (currDate >= this.assignedAt) {
+  } else if (this.assignedAt <= currDate) {
     this.state = "inProgress";
-  } else if (currDate >= this.endingAt) {
+  }
+  if (currDate >= this.endingAt) {
     this.state = "done";
   }
 

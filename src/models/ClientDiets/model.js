@@ -160,17 +160,12 @@ clientDietSchema.pre("save", function (next) {
 clientDietSchema.methods.clacDates = function () {
   const currDate = new Date();
 
-  let dayCount = this.days.length;
-  this.assignedAt = new Date(this.assignedAt);
-  this.endingAt = new Date(
-    this.assignedAt.getTime() + parseTime(`${dayCount}d`, "ms")
-  );
-
   if (this.assignedAt > currDate) {
     this.state = "pendingStart";
   } else if (this.assignedAt <= currDate) {
     this.state = "inProgress";
-  } else if (this.endingAt <= currDate) {
+  }
+  if (currDate >= this.endingAt) {
     this.state = "done";
   }
 
@@ -184,10 +179,11 @@ clientDietSchema.methods.clacDates = function () {
 clientDietSchema.methods.checkState = function () {
   const currDate = new Date();
 
-  if (currDate >= this.assignedAt) {
+  if (this.assignedAt > currDate) {
+    this.state = "pendingStart";
+  } else if (this.assignedAt <= currDate) {
     this.state = "inProgress";
   }
-
   if (currDate >= this.endingAt) {
     this.state = "done";
   }

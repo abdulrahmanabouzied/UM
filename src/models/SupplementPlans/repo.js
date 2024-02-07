@@ -24,7 +24,7 @@ class SupplementPlanRepository {
     }
   }
 
-  async assignPlan(clientId, planId, assignedAt) {
+  async assignPlan(clientId, planId, assignedAt, endingAt) {
     try {
       const client = await Client.findById(clientId);
 
@@ -45,6 +45,7 @@ class SupplementPlanRepository {
         client: client._id,
         plan: assignedPlan._id,
         assignedAt,
+        endingAt,
         days: assignedPlan.days.toObject(),
       };
 

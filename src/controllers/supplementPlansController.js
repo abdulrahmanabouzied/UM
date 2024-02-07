@@ -203,7 +203,7 @@ class SupplementPlansController {
   async assignPlan(req, res, next) {
     // client id
     const { id, plan } = req.params;
-    const { assignedAt } = req.body;
+    const { assignedAt, endingAt } = req.body;
 
     if (!plan || !assignedAt) {
       return next(new AppError("planId or assignedAt is missing", 400));
@@ -212,7 +212,8 @@ class SupplementPlansController {
     const result = await supplementPlanRepository.assignPlan(
       id,
       plan,
-      assignedAt
+      assignedAt,
+      endingAt
     );
 
     if (!result.success) {

@@ -35,7 +35,7 @@ app
   .patch(asyncHandler(Controller.editDay));
 
 app
-  .route("/clients/:id")
+  .route("/:plan/clients/:id")
   .all(authenticate)
   .post(asyncHandler(clientWorkoutsController.assignPlan));
 

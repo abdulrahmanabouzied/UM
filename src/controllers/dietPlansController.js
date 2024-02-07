@@ -206,13 +206,18 @@ class DietPlansController {
   async assignPlan(req, res, next) {
     // client id
     const { id, plan } = req.params;
-    const { assignedAt } = req.body;
+    const { assignedAt, endingAt } = req.body;
 
     if (!plan || !assignedAt) {
       return next(new AppError("planId or assignedAt is missing", 400));
     }
 
-    const result = await dietPlanRepository.assignPlan(id, plan, assignedAt);
+    const result = await dietPlanRepository.assignPlan(
+      id,
+      plan,
+      assignedAt,
+      endingAt
+    );
 
     if (!result.success) {
       return next(result);
