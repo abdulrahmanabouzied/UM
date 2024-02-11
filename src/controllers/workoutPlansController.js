@@ -179,6 +179,19 @@ class WorkoutPlansController {
       // exerciseData.image = uploadedImage.data;
     }
 
+    if (planData?.days) {
+      if (typeof planData.days === "string") {
+        try {
+          planData.days = JSON.parse(planData.days);
+        } catch (error) {
+          console.log(error);
+          return next(new AppError("INVALID_JSON", "days must be a JSON", 400));
+        }
+      }
+    }
+
+    console.log(planData);
+
     const result = await workoutPlanRepository.create(planData);
     if (!result.success) {
       return next(result);
