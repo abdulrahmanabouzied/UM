@@ -240,8 +240,8 @@ class clientsAuthController {
       date: new Date(),
     });
 
-    let accessToken = await generateToken(data, parseTime("5m", "s"));
-    let refreshToken = await generateToken(data, parseTime("10m", "s"));
+    let accessToken = await generateToken(data, parseTime("1d", "s"));
+    let refreshToken = await generateToken(data, parseTime("10d", "s"));
 
     res.status(200).json({
       success: true,
