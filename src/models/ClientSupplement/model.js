@@ -191,6 +191,7 @@ clientSupplementSchema.methods.addDay = function (day) {
 // get day by date [mm, dd, yyyy]
 clientSupplementSchema.methods.getDayByDate = function (date) {
   date = new Date(date || Date.now());
+  console.log("🚀 ~ day ~ this.days:", this.days)
 
   const day = this.days.find((day) => {
     return (

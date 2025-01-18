@@ -1,17 +1,17 @@
-import ClientRepository from "../models/Clients/repo.js";
-import AppError from "../utils/appError.js";
+import ClientRepository from '../models/Clients/repo.js';
+import AppError from '../utils/appError.js';
 
-import Client from "../models/Clients/model.js";
-import mongoose from "mongoose";
+import Client from '../models/Clients/model.js';
+import mongoose from 'mongoose';
 import {
   uploadFile,
   removeFile,
   handleFiles,
-} from "../middlewares/cloudinaryUploader.js";
-import fs from "fs";
-import path from "path";
-import url from "url";
-const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
+} from '../middlewares/cloudinaryUploader.js';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 // import ClientWorkout from "./../models/ClientWorkouts/model.js";
 
@@ -34,7 +34,7 @@ class ClientsController {
     const { query } = req.query;
     const result = await clientRepository
       .getOneCoach({ _id: clientId }, query)
-      .populate("coach");
+      .populate('coach');
     if (!result.success) {
       return next(result);
     }
@@ -54,15 +54,15 @@ class ClientsController {
       const { id } = req.params;
       const client = await Client.findById(id)
         .populate({
-          path: "WorkoutPlan",
+          path: 'WorkoutPlan',
           populate: {
-            path: "days.exercises.exercise",
+            path: 'days.exercises.exercise',
           },
         })
-        .select("WorkoutPlan");
+        .select('WorkoutPlan');
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "Client not found", 404));
+        return next(new AppError('NOT_FOUND', 'Client not found', 404));
       }
 
       client.WorkoutPlan.checkState();
@@ -84,15 +84,15 @@ class ClientsController {
       const { id } = req.params;
 
       let populateList = [
-        "breakfast",
-        "midMorning",
-        "lunch",
-        "eveningSnacks",
-        "dinner",
+        'breakfast',
+        'midMorning',
+        'lunch',
+        'eveningSnacks',
+        'dinner',
       ];
 
       let fields = populateList.map((item) => ({
-        path: "NutritionPlan",
+        path: 'NutritionPlan',
         populate: {
           path: `days.${item}.ingredients.item`,
         },
@@ -100,10 +100,10 @@ class ClientsController {
 
       const client = await Client.findById(id)
         .populate(fields)
-        .select("NutritionPlan _id");
+        .select('NutritionPlan _id');
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "Client not found", 404));
+        return next(new AppError('NOT_FOUND', 'Client not found', 404));
       }
 
       await client.NutritionPlan.checkState();
@@ -127,15 +127,15 @@ class ClientsController {
       let day, plan;
 
       let populateList = [
-        "breakfast",
-        "midMorning",
-        "lunch",
-        "eveningSnacks",
-        "dinner",
+        'breakfast',
+        'midMorning',
+        'lunch',
+        'eveningSnacks',
+        'dinner',
       ];
 
       let fields = populateList.map((item) => ({
-        path: "NutritionPlan",
+        path: 'NutritionPlan',
         populate: {
           path: `days.${item}.ingredients.item`,
         },
@@ -143,17 +143,17 @@ class ClientsController {
 
       const client = await Client.findById(id)
         .populate(fields)
-        .select("NutritionPlan");
+        .select('NutritionPlan');
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "Client not found", 404));
+        return next(new AppError('NOT_FOUND', 'Client not found', 404));
       }
 
       await client.NutritionPlan.checkState();
       await client.NutritionPlan.save();
 
       if (!client.NutritionPlan) {
-        return next(new AppError("NOT_FOUND", "Plan not found", 404));
+        return next(new AppError('NOT_FOUND', 'Plan not found', 404));
       }
 
       if (!order && !date) {
@@ -179,7 +179,7 @@ class ClientsController {
       }
 
       if (!day) {
-        return next(new AppError("NOT_FOUND", "Day not found", 404));
+        return next(new AppError('NOT_FOUND', 'Day not found', 404));
       }
 
       if (query) {
@@ -204,15 +204,15 @@ class ClientsController {
       let day, plan;
 
       let populateList = [
-        "breakfast",
-        "midMorning",
-        "lunch",
-        "eveningSnacks",
-        "dinner",
+        'breakfast',
+        'midMorning',
+        'lunch',
+        'eveningSnacks',
+        'dinner',
       ];
 
       let fields = populateList.map((item) => ({
-        path: "SupplementPlan",
+        path: 'SupplementPlan',
         populate: {
           path: `days.${item}.supplements.item`,
         },
@@ -220,14 +220,14 @@ class ClientsController {
 
       const client = await Client.findById(id)
         .populate(fields)
-        .select("SupplementPlan");
+        .select('SupplementPlan');
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "Client not found", 404));
+        return next(new AppError('NOT_FOUND', 'Client not found', 404));
       }
 
       if (!client.SupplementPlan) {
-        return next(new AppError("NOT_FOUND", "Plan not found", 404));
+        return next(new AppError('NOT_FOUND', 'Plan not found', 404));
       }
 
       await client.SupplementPlan.checkState();
@@ -276,22 +276,22 @@ class ClientsController {
       let day;
 
       let populateList = [
-        "breakfast",
-        "midMorning",
-        "lunch",
-        "eveningSnacks",
-        "dinner",
+        'breakfast',
+        'midMorning',
+        'lunch',
+        'eveningSnacks',
+        'dinner',
       ];
 
       let fields = populateList.map((item) => ({
-        path: "SupplementPlan",
+        path: 'SupplementPlan',
         populate: {
           path: `days.${item}.supplements.item`,
         },
       }));
 
       const formatDay = (day, populateList) => {
-        if (!day) next(new AppError("NOT_FOUND", "Day not found", 400));
+        if (!day) next(new AppError('NOT_FOUND', 'Day not found', 400));
         return populateList.map((list) => {
           let result = {
             meal: list,
@@ -305,14 +305,14 @@ class ClientsController {
 
       const client = await Client.findById(id)
         .populate(fields)
-        .select("SupplementPlan");
+        .select('SupplementPlan');
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "Client not found", 404));
+        return next(new AppError('NOT_FOUND', 'Client not found', 404));
       }
 
       if (!client.SupplementPlan) {
-        return next(new AppError("NOT_FOUND", "Plan not found", 404));
+        return next(new AppError('NOT_FOUND', 'Plan not found', 404));
       }
 
       if (!date) {
@@ -328,11 +328,17 @@ class ClientsController {
         });
       }
 
+
       await client.SupplementPlan.checkState();
       await client.SupplementPlan.save();
 
       day = client.SupplementPlan.getDayByDate(date);
       // day = formatDay(day, populateList);
+
+      console.log(
+        '🚀 ~ ClientsController ~ getSupplePlanDayItems ~ client:',
+        day, date
+      );
 
       res.status(200).json({
         success: true,
@@ -351,15 +357,15 @@ class ClientsController {
       const { id } = req.params;
 
       let populateList = [
-        "breakfast",
-        "midMorning",
-        "lunch",
-        "eveningSnacks",
-        "dinner",
+        'breakfast',
+        'midMorning',
+        'lunch',
+        'eveningSnacks',
+        'dinner',
       ];
 
       let fields = populateList.map((item) => ({
-        path: "SupplementPlan",
+        path: 'SupplementPlan',
         populate: {
           path: `days.${item}.supplements.item`,
         },
@@ -367,10 +373,10 @@ class ClientsController {
 
       const client = await Client.findById(id)
         .populate(fields)
-        .select("SupplementPlan");
+        .select('SupplementPlan');
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "Client not found", 404));
+        return next(new AppError('NOT_FOUND', 'Client not found', 404));
       }
 
       await client.SupplementPlan.checkState();
@@ -404,21 +410,21 @@ class ClientsController {
     const client = await Client.findById(id);
 
     if (!client) {
-      return next(new AppError("NOT_FOUND", "coach not found", 404));
+      return next(new AppError('NOT_FOUND', 'coach not found', 404));
     }
 
     if (client?.coach) {
-      await client.populate("coach");
+      await client.populate('coach');
     }
 
     if (files?.picture) {
       if (client?.picture) {
-        const flushed = await removeFile("image", client?.picture.public_id);
+        const flushed = await removeFile('image', client?.picture.public_id);
         if (!flushed.success) {
           return next(flushed);
         }
       }
-      uploadedData = await handleFiles(newData, files, "Clients", "picture");
+      uploadedData = await handleFiles(newData, files, 'Clients', 'picture');
       if (!uploadedData) {
         return next(uploadedData);
       }
@@ -442,7 +448,7 @@ class ClientsController {
     // }
     if (files?.inbody) {
       if (client?.inbody?.public_id) {
-        const flushed = await removeFile("raw", client?.inbody?.public_id);
+        const flushed = await removeFile('raw', client?.inbody?.public_id);
         if (!flushed.success) {
           return next(flushed);
         }
@@ -450,9 +456,9 @@ class ClientsController {
       uploadedData = await handleFiles(
         newData,
         files,
-        "Clients",
-        "inbody",
-        "raw"
+        'Clients',
+        'inbody',
+        'raw'
       );
       if (!uploadedData) {
         return next(uploadedData);
@@ -462,7 +468,7 @@ class ClientsController {
 
     if (client?.coach && newData?.inbody) {
       client.coach.notifications.push({
-        title: "inbody uploaded",
+        title: 'inbody uploaded',
         message: `${client.fullname} uploaded an inbody.`,
         date: new Date(),
       });
@@ -485,7 +491,7 @@ class ClientsController {
     const client = await Client.findById(id);
 
     if (!client) {
-      return next(new AppError("NOT_FOUND", "client not found", 404));
+      return next(new AppError('NOT_FOUND', 'client not found', 404));
     }
 
     if (client?.inbody) {
@@ -495,13 +501,13 @@ class ClientsController {
         // console.log(filePath);
         // console.log(path.join(__dirname, filePath));
 
-        return res.sendFile(path.join(__dirname, "..", "..", filePath));
+        return res.sendFile(path.join(__dirname, '..', '..', filePath));
       } catch (error) {
-        return next(new AppError(error.name, "Error Finding file", 500));
+        return next(new AppError(error.name, 'Error Finding file', 500));
       }
     }
 
-    return next(new AppError("NOT_FOUND", "inbody not found", 404));
+    return next(new AppError('NOT_FOUND', 'inbody not found', 404));
   }
 
   async requestInbody(req, res, next) {
@@ -510,7 +516,7 @@ class ClientsController {
     const client = await Client.findById(id);
 
     if (!client) {
-      return next(new AppError("NOT_FOUND", "coach not found", 404));
+      return next(new AppError('NOT_FOUND', 'coach not found', 404));
     }
 
     if (!client?.coach) {
@@ -519,7 +525,7 @@ class ClientsController {
 
     client.inbodyRequested = true;
     client.notifications.push({
-      title: "inbody request",
+      title: 'inbody request',
       message: `your coach has requested an inbody.`,
       date: new Date(),
     });
@@ -527,7 +533,7 @@ class ClientsController {
     res.status(200).json({
       success: true,
       status: 200,
-      data: "inbody requested successfully",
+      data: 'inbody requested successfully',
     });
   }
 
@@ -538,13 +544,13 @@ class ClientsController {
     const client = await Client.findById(id);
 
     if (!client) {
-      return next(new AppError("NOT_FOUND", "coach not found", 404));
+      return next(new AppError('NOT_FOUND', 'coach not found', 404));
     }
 
     await client.updateOne(
       {
         $set: {
-          "notifications.$[].seen": true,
+          'notifications.$[].seen': true,
         },
       },
       {
@@ -568,12 +574,12 @@ class ClientsController {
       const client = await Client.findById(id);
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "coach not found", 404));
+        return next(new AppError('NOT_FOUND', 'coach not found', 404));
       }
 
       if (!noteId && !order) {
         return next(
-          new AppError("NOT_FOUND", "noteId or order not found", 404)
+          new AppError('NOT_FOUND', 'noteId or order not found', 404)
         );
       }
 
@@ -600,7 +606,7 @@ class ClientsController {
       res.status(200).json({
         success: true,
         status: 200,
-        data: "deleted successfully!",
+        data: 'deleted successfully!',
       });
     } catch (error) {
       return next(new AppError(error.name, error, 500));
@@ -618,13 +624,13 @@ class ClientsController {
       });
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "coach not found", 404));
+        return next(new AppError('NOT_FOUND', 'coach not found', 404));
       }
 
       res.status(200).json({
         success: true,
         status: 200,
-        data: "Notifications deleted successfully!",
+        data: 'Notifications deleted successfully!',
       });
     } catch (error) {
       return next(new AppError(error.name, error, 500));
@@ -639,12 +645,12 @@ class ClientsController {
       const client = await Client.findById(id);
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "coach not found", 404));
+        return next(new AppError('NOT_FOUND', 'coach not found', 404));
       }
 
       if (!noteId && !order) {
         return next(
-          new AppError("NOT_FOUND", "noteId or order not found", 404)
+          new AppError('NOT_FOUND', 'noteId or order not found', 404)
         );
       }
 
@@ -655,14 +661,14 @@ class ClientsController {
         await client.updateOne(
           {
             $set: {
-              "notifications.$[elem].seen": true,
+              'notifications.$[elem].seen': true,
             },
           },
           {
             new: true,
             arrayFilters: [
               {
-                "elem._id": mongoose.Types.ObjectId(noteId),
+                'elem._id': mongoose.Types.ObjectId(noteId),
               },
             ],
           }
@@ -674,7 +680,7 @@ class ClientsController {
       res.status(200).json({
         success: true,
         status: 200,
-        data: "seen successfully!",
+        data: 'seen successfully!',
       });
     } catch (err) {
       return next(new AppError(err.name, err.message, 500));
@@ -689,7 +695,7 @@ class ClientsController {
         id,
         {
           $set: {
-            "notifications.$[].seen": true,
+            'notifications.$[].seen': true,
           },
         },
         {
@@ -698,13 +704,13 @@ class ClientsController {
       );
 
       if (!client) {
-        return next(new AppError("NOT_FOUND", "coach not found", 404));
+        return next(new AppError('NOT_FOUND', 'coach not found', 404));
       }
 
       res.status(200).json({
         success: true,
         status: 200,
-        data: "all marked seen successfully.",
+        data: 'all marked seen successfully.',
       });
     } catch (err) {
       return next(new AppError(err.name, err.message, 500));
