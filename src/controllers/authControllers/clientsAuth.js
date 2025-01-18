@@ -1,11 +1,11 @@
-import Client from "../../models/Clients/model.js";
-import Coach from "../../models/Coaches/model.js";
-import sendMail from "../../utils/mailer.js";
-import AppError from "../../utils/appError.js";
-import { generateToken } from "./../../utils/token.service.js";
-import crypto from "crypto";
-import { parseTime } from "../../utils/time.service.js";
-import Notifications from "../../utils/notify.service.js";
+import Client from '../../models/Clients/model.js';
+import Coach from '../../models/Coaches/model.js';
+import sendMail from '../../utils/mailer.js';
+import AppError from '../../utils/appError.js';
+import { generateToken } from './../../utils/token.service.js';
+import crypto from 'crypto';
+import { parseTime } from '../../utils/time.service.js';
+import Notifications from '../../utils/notify.service.js';
 const notify = new Notifications(Coach);
 
 class clientsAuthController {
@@ -16,7 +16,7 @@ class clientsAuthController {
 
     if (foundClient) {
       return next(
-        new AppError("EMAIL_ALREADY_EXIST", "this email already exists", 400)
+        new AppError('EMAIL_ALREADY_EXIST', 'this email already exists', 400)
       );
     }
 
@@ -30,8 +30,8 @@ class clientsAuthController {
     if (!client) {
       return next(
         new AppError(
-          "CREATING_USER_ERROR",
-          "error while creating the user",
+          'CREATING_USER_ERROR',
+          'error while creating the user',
           500
         )
       );
@@ -40,7 +40,7 @@ class clientsAuthController {
 
     const mail = await sendMail(
       client.email,
-      "Email Verification",
+      'Email Verification',
       null,
       `Verification Code is: ${OTP}`
     );
@@ -56,13 +56,13 @@ class clientsAuthController {
     client.verifyEmailExpires = undefined;
     await client.save({ validateBeforeSave: false });
 
-    next(new AppError("EMAILING_ERROR", "error sending email", 500));
+    next(new AppError('EMAILING_ERROR', 'error sending email', 500));
   }
 
   async authGoogle(client) {
     const { id, email, displayName } = client;
     const existingUser = await Client.findOne({
-      "ssoAuth.googleId": id,
+      'ssoAuth.googleId': id,
     });
     if (existingUser) {
       return existingUser;
@@ -73,8 +73,8 @@ class clientsAuthController {
       // firstName: profile.name.givenName,
       // lastName: profile.name.familyName,
       email,
-      password: "",
-      role: "client",
+      password: '',
+      role: 'client',
     };
     //handle create user fields
     const user = await Client.create(userObj);
@@ -92,8 +92,8 @@ class clientsAuthController {
       role: client.role,
     };
 
-    let accessToken = await generateToken(data, parseTime("1d", "s"));
-    let refreshToken = await generateToken(data, parseTime("10d", "s"));
+    let accessToken = await generateToken(data, parseTime('1d', 's'));
+    let refreshToken = await generateToken(data, parseTime('10d', 's'));
 
     if (!client.emailActive) {
       client.emailActive = true;
@@ -116,10 +116,10 @@ class clientsAuthController {
   async login(req, res, next) {
     const { email, password } = req.body;
     // password is select: false, so +password to select it
-    const client = await Client.findOne({ email }).select("+password");
+    const client = await Client.findOne({ email }).select('+password');
 
     if (!client || !(await client.checkPassword(password, client.password))) {
-      return next(new AppError("LGOIN_FAIL", "Invalid Credentials", 401));
+      return next(new AppError('LGOIN_FAIL', 'Invalid Credentials', 401));
     }
 
     let data = {
@@ -128,11 +128,11 @@ class clientsAuthController {
       role: client.role,
     };
 
-    let accessToken = await generateToken(data, parseTime("1d", "s"));
-    let refreshToken = await generateToken(data, parseTime("10d", "s"));
+    let accessToken = await generateToken(data, parseTime('1d', 's'));
+    let refreshToken = await generateToken(data, parseTime('10d', 's'));
 
     if (!client.emailActive) {
-      return next(new AppError("EMAIL_NOT_ACTIVE", "verify your email", 403));
+      return next(new AppError('EMAIL_NOT_ACTIVE', 'verify your email', 403));
     }
 
     client.active = true;
@@ -155,14 +155,14 @@ class clientsAuthController {
     const { email } = req.body;
 
     if (!email) {
-      return next(new AppError("BAD_REQUEST", "invalid request data", 400));
+      return next(new AppError('BAD_REQUEST', 'invalid request data', 400));
     }
 
     const client = await Client.findOne({ email });
 
     if (!client) {
       return next(
-        new AppError("USER_NOT_FOUND", `cannot find user with ${email}`, 404)
+        new AppError('USER_NOT_FOUND', `cannot find user with ${email}`, 404)
       );
     }
 
@@ -172,7 +172,7 @@ class clientsAuthController {
 
     const mail = await sendMail(
       client.email,
-      "Email Verification",
+      'Email Verification',
       null,
       `Verification Code is: ${OTP}`
     );
@@ -181,7 +181,7 @@ class clientsAuthController {
       return res.status(200).json({
         success: true,
         status: 200,
-        data: "Verify Email sent successfully.",
+        data: 'Verify Email sent successfully.',
       });
     }
 
@@ -189,13 +189,13 @@ class clientsAuthController {
     client.verifyEmailExpires = undefined;
     await client.save({ validateBeforeSave: false });
 
-    next(new AppError("EMAILING_ERROR", "error sending email", 500));
+    next(new AppError('EMAILING_ERROR', 'error sending email', 500));
   }
 
   async verifyEmail(req, res, next) {
     let { OTP } = req.params;
 
-    OTP = crypto.createHash("sha256").update(OTP).digest("hex");
+    OTP = crypto.createHash('sha256').update(OTP).digest('hex');
 
     const client = await Client.findOneAndUpdate(
       {
@@ -206,6 +206,7 @@ class clientsAuthController {
       },
       {
         emailActive: true,
+        active: true,
         $unset: {
           verifyEmailOTPToken: null,
           verifyEmailExpires: null,
@@ -214,14 +215,14 @@ class clientsAuthController {
       {
         new: true,
       }
-    ).select("_id email");
+    ).select('_id email');
 
     // console.log(`Code: ${OTP}`);
     // console.log(`Verifying email: `, client);
 
     if (!client) {
       return next(
-        new AppError("USER_NOT_FOUND", "Token Expired or user not found", 404)
+        new AppError('USER_NOT_FOUND', 'Token Expired or user not found', 404)
       );
     }
 
@@ -235,13 +236,13 @@ class clientsAuthController {
 
     // send a note to the coach
     await notify.notifyCoach({
-      title: "registeration",
-      message: "new client entered UM",
+      title: 'registeration',
+      message: 'new client entered UM',
       date: new Date(),
     });
 
-    let accessToken = await generateToken(data, parseTime("1d", "s"));
-    let refreshToken = await generateToken(data, parseTime("10d", "s"));
+    let accessToken = await generateToken(data, parseTime('1d', 's'));
+    let refreshToken = await generateToken(data, parseTime('10d', 's'));
 
     res.status(200).json({
       success: true,
@@ -256,7 +257,7 @@ class clientsAuthController {
     const client = await Client.findOne({ email });
 
     if (!client) {
-      return next(new AppError("CLIENT_NOT_FOUND", "email is not found", 404));
+      return next(new AppError('CLIENT_NOT_FOUND', 'email is not found', 404));
     }
 
     const OTP = Math.round(Math.random() * 90000) + 10000;
@@ -265,28 +266,28 @@ class clientsAuthController {
     await client.save({ validateBeforeSave: false });
 
     const msg = `forgot password code: ${OTP}\nif you didn't forget your password, simply ignore this email.`;
-    const mail = await sendMail(client.email, "Forgot Password", null, msg);
+    const mail = await sendMail(client.email, 'Forgot Password', null, msg);
 
     if (!mail.success) {
       client.forgotPasswordOTP = undefined;
       client.passwordResetExpires = undefined;
       await client.save({ validateBeforeSave: false });
       return next(
-        new AppError("EMAIL_NOT_SENT", `couldn't send email to ${email}`, 500)
+        new AppError('EMAIL_NOT_SENT', `couldn't send email to ${email}`, 500)
       );
     }
 
     res.status(200).json({
       status: 200,
       success: true,
-      data: "forgot password email sent successfully",
+      data: 'forgot password email sent successfully',
     });
   }
 
   async verifyForgotPassword(req, res, next) {
     const { OTP } = req.params;
 
-    const hashedOTP = crypto.createHash("sha256").update(OTP).digest("hex");
+    const hashedOTP = crypto.createHash('sha256').update(OTP).digest('hex');
 
     const client = await Client.findOne({
       forgotPasswordOTP: hashedOTP,
@@ -297,7 +298,7 @@ class clientsAuthController {
 
     if (!client) {
       return next(
-        new AppError("CLIENT_NOT_FOUND", "OTP expired or user not found", 404)
+        new AppError('CLIENT_NOT_FOUND', 'OTP expired or user not found', 404)
       );
     }
 
@@ -318,7 +319,7 @@ class clientsAuthController {
     let { token } = req.params;
     const { password } = req.body;
 
-    token = crypto.createHash("sha256").update(token).digest("hex");
+    token = crypto.createHash('sha256').update(token).digest('hex');
     const client = await Client.findOne({
       passwordResetTokenOTP: token,
       passwordResetExpires: {
@@ -329,8 +330,8 @@ class clientsAuthController {
     if (!client) {
       return next(
         new AppError(
-          "CLIENT_NOT_FOUND",
-          "token expired or client not found",
+          'CLIENT_NOT_FOUND',
+          'token expired or client not found',
           404
         )
       );
@@ -356,10 +357,10 @@ class clientsAuthController {
     const { id } = req.user;
     const { password, currPassword } = req.body;
 
-    const client = await Client.findById(id).select("+password");
+    const client = await Client.findById(id).select('+password');
 
     if (!client) {
-      return next(new AppError("CLIENT_NOT_FOUND", "user not found", 404));
+      return next(new AppError('CLIENT_NOT_FOUND', 'user not found', 404));
     }
 
     const correct = await client.checkPassword(currPassword, client.password);
@@ -367,7 +368,7 @@ class clientsAuthController {
     if (!correct) {
       // 300 for multiple Choices (things to do )
       return next(
-        new AppError("INVALID_PASSWORD", "password is incorrect.", 300)
+        new AppError('INVALID_PASSWORD', 'password is incorrect.', 300)
       );
     }
 
@@ -379,7 +380,7 @@ class clientsAuthController {
     res.status(200).json({
       success: true,
       status: 200,
-      data: "Password updated successfully",
+      data: 'Password updated successfully',
     });
   }
 }

@@ -19,6 +19,16 @@ const clientRepository = new ClientRepository();
 
 class ClientsController {
   // Client Data Routes
+  async getMe(req, res, next) {
+    const clientId = req.user.id;
+    const { query } = req.query;
+    const result = await clientRepository.getOne({ _id: clientId }, query);
+    if (!result.success) {
+      return next(result);
+    }
+    res.status(result.status).json(result);
+  }
+
   async getClient(req, res, next) {
     const clientId = req.params.id;
     const { query } = req.query;

@@ -11,6 +11,8 @@ const upload = uploader();
 app.route("/").all(authenticate).get(Controller.getAllClients);
 
 // Manipulate Client
+app.get('/me', authenticate, Controller.getMe);
+
 app
   .route("/:id")
   .all(authenticate)
@@ -21,7 +23,7 @@ app
     ]),
     asyncHandler(Controller.updateClient)
   )
-  .get(asyncHandler(Controller.getClient))
+  .get(restrictTo('coach'), asyncHandler(Controller.getClient))
   .delete(asyncHandler(Controller.deleteClient));
 
 // Client Plans
