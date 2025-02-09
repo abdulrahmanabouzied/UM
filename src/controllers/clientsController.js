@@ -420,7 +420,7 @@ class ClientsController {
     const client = await Client.findById(id);
 
     if (!client) {
-      return next(new AppError('NOT_FOUND', 'coach not found', 404));
+      return next(new AppError('NOT_FOUND', 'client not found', 404));
     }
 
     if (client?.coach) {
@@ -440,22 +440,6 @@ class ClientsController {
       }
     }
 
-    // if (files?.inbody) {
-    //   if (client?.inbody?.path) {
-    //     try {
-    //       fs.unlinkSync(client.inbody.path);
-    //     } catch (error) {
-    //       console.log(error.code);
-    //       if (error.code != "ENOENT") {
-    //         return next(error);
-    //       }
-    //     }
-    //   }
-
-    //   const file = files.inbody[0];
-    //   newData.inbody = file;
-    //   client.inbodyRequested = false;
-    // }
     if (files?.inbody) {
       if (client?.inbody?.public_id) {
         const flushed = await removeFile('raw', client?.inbody?.public_id);
@@ -485,13 +469,12 @@ class ClientsController {
       await client.coach.save();
     }
 
-    await client.updateOne(newData, { new: true });
+    await client.updateOne(newData);
     await client.save();
 
     res.status(200).json({
       success: true,
-      status: 200,
-      data: client.toObject(),
+      status: 200
     });
   }
 

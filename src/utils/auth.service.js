@@ -1,32 +1,31 @@
 // for handling tokens and authorization issues.
-import AppError from "../utils/appError.js";
-import { verifyToken, generateToken } from "./token.service.js";
-import Client from "../models/Clients/model.js";
-import asyncHandler from "./asyncHandler.js";
-import { parseTime } from "../utils/time.service.js";
-import Coach from "./../models/Coaches/model.js";
+import AppError from '../utils/appError.js';
+import { verifyToken, generateToken } from './token.service.js';
+import Client from '../models/Clients/model.js';
+import asyncHandler from './asyncHandler.js';
+import { parseTime } from '../utils/time.service.js';
+import Coach from './../models/Coaches/model.js';
 
 // authenticate Clients
 export const authenticate = asyncHandler(async (req, res, next) => {
   const accessToken =
-    req.headers["authorization"] &&
-    req.headers["authorization"].replace("Bearer ", "");
-  const refreshToken = req.headers["x-refresh-token"];
+    req.headers['authorization'] &&
+    req.headers['authorization'].replace('Bearer ', '');
+  const refreshToken = req.headers['x-refresh-token'];
   let user;
 
-  if (!accessToken || !refreshToken) {
-    return next(
-      new AppError("TOKEN_NOT_FOUND", "Access or Refresh token not found")
-    );
+  if (!accessToken) {
+    return next(new AppError('TOKEN_NOT_FOUND', 'Access token not found'));
   }
 
   const { error, data } = await verifyToken(accessToken);
+  console.log("🚀 ~ authenticate ~ error, data:", error, data)
 
-  if (error?.name === "TokenExpiredError") {
+  if (error?.name === 'TokenExpiredError') {
     let { error, data } = await verifyToken(refreshToken);
 
-    if (error?.name === "TokenExpiredError") {
-      return next(new AppError("TOKEN_EXPIRED", "please login again", 401));
+    if (error?.name === 'TokenExpiredError') {
+      return next(new AppError('TOKEN_EXPIRED', 'please login again', 401));
     }
 
     if (error) {
@@ -40,12 +39,12 @@ export const authenticate = asyncHandler(async (req, res, next) => {
     }
 
     if (!user) {
-      return next(new AppError("USER_NOT_FOUND", "user not found", 404));
+      return next(new AppError('USER_NOT_FOUND', 'user not found', 404));
     }
 
     if (!user.emailActive) {
       return next(
-        new AppError("USER_NOT_ACTIVE", "user email not verified", 401)
+        new AppError('USER_NOT_ACTIVE', 'user email not verified', 401)
       );
     }
 
@@ -55,13 +54,13 @@ export const authenticate = asyncHandler(async (req, res, next) => {
       role: user.role,
     };
 
-    const newAccessToken = await generateToken(data, parseTime("1d", "s"));
-    const newRefreshToken = await generateToken(data, parseTime("10d", "s"));
+    const newAccessToken = await generateToken(data, parseTime('1d', 's'));
+    const newRefreshToken = await generateToken(data, parseTime('10d', 's'));
 
     return next(
       new AppError(
-        "ACCESS_TOKEN_EXPIRED",
-        "an error occurred, please try login again!",
+        'ACCESS_TOKEN_EXPIRED',
+        'an error occurred, please try login again!',
         401,
         false,
         {
@@ -84,17 +83,17 @@ export const authenticate = asyncHandler(async (req, res, next) => {
   }
 
   if (!user) {
-    return next(new AppError("USER_NOT_FOUND", "user not found", 404));
+    return next(new AppError('USER_NOT_FOUND', 'user not found', 404));
   }
 
   if (!user.emailActive) {
     return next(
-      new AppError("EMAIL_NOT_ACTIVE", "user email not verified", 401)
+      new AppError('EMAIL_NOT_ACTIVE', 'user email not verified', 401)
     );
   }
 
   if (!user.active) {
-    return next(new AppError("USER_NOT_ACTIVE", "please login again!", 401));
+    return next(new AppError('USER_NOT_ACTIVE', 'please login again!', 401));
   }
 
   user = {
@@ -118,7 +117,7 @@ export const restrictTo =
 
     next(
       new AppError(
-        "PERMISSION_DENIED",
+        'PERMISSION_DENIED',
         `You are not allowed to use${req.originalUrl}`,
         403
       )
